@@ -1,89 +1,67 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search, Warehouse, Package, Users, UserCircle, History, Archive } from "lucide-react";
+import { Search, Warehouse, Package, Users, UserCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+import ProductCard, { Product } from "@/components/product-card";
 
-const verificationHistory = {
-  "Daikin Split AC 1.5PK": [
-    { date: "2024-03-20", stock: 5, verified: true },
-    { date: "2024-03-15", stock: 10, verified: true }
-  ],
-  "Modena Built-in Oven": [
-    { date: "2024-03-18", stock: 8, verified: true },
-    { date: "2024-03-10", stock: 15, verified: false }
-  ]
-};
-
-const calculateStockInfo = (productName) => {
-  const history = verificationHistory[productName] || [];
-  const totalStock = history.reduce((sum, record) => sum + record.stock, 0);
-  const verifiedStock = history
-    .filter(record => record.verified)
-    .reduce((sum, record) => sum + record.stock, 0);
-  return { totalStock, verifiedStock };
-};
+const products: Product[] = [
+  {
+    id: 1,
+    name: "Daikin Split AC 1.5PK",
+    supplier: "Daikin",
+    category: "Air Conditioner",
+    status: "Pending",
+    image: "https://images.unsplash.com/photo-1631567091196-d30fa3987905?auto=format&fit=crop&q=80&w=400",
+  },
+  {
+    id: 2,
+    name: "Modena Built-in Oven",
+    supplier: "Modena",
+    category: "Kitchen Appliance",
+    status: "Verified",
+    image: "https://images.unsplash.com/photo-1585237017125-24baf8d7406f?auto=format&fit=crop&q=80&w=400",
+  },
+  {
+    id: 3,
+    name: "Samsung Smart TV",
+    supplier: "Blibli",
+    category: "Television",
+    status: "Verified",
+    image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&q=80&w=400",
+  },
+  {
+    id: 4,
+    name: "LG Refrigerator",
+    supplier: "Blibli",
+    category: "Kitchen Appliance",
+    status: "Pending",
+    image: "https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&q=80&w=400",
+  },
+  {
+    id: 5,
+    name: "Modena Gas Stove",
+    supplier: "Modena",
+    category: "Kitchen Appliance",
+    status: "Pending",
+    image: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&q=80&w=400",
+  },
+  {
+    id: 6,
+    name: "iPhone 14 Pro",
+    supplier: "Grab",
+    category: "Smartphone",
+    status: "Verified",
+    image: "https://images.unsplash.com/photo-1678685888221-cda773a3dcdb?auto=format&fit=crop&q=80&w=400",
+  }
+];
 
 export default function Products() {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
-
-  const products = [
-    {
-      id: 1,
-      name: "Daikin Split AC 1.5PK",
-      supplier: "Daikin",
-      category: "Air Conditioner",
-      status: "Pending",
-      image: "https://images.unsplash.com/photo-1631567091196-d30fa3987905?auto=format&fit=crop&q=80&w=400",
-    },
-    {
-      id: 2,
-      name: "Modena Built-in Oven",
-      supplier: "Modena",
-      category: "Kitchen Appliance",
-      status: "Verified",
-      image: "https://images.unsplash.com/photo-1585237017125-24baf8d7406f?auto=format&fit=crop&q=80&w=400",
-    },
-    {
-      id: 3,
-      name: "Samsung Smart TV",
-      supplier: "Blibli",
-      category: "Television",
-      status: "Verified",
-      image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&q=80&w=400",
-    },
-    {
-      id: 4,
-      name: "LG Refrigerator",
-      supplier: "Blibli",
-      category: "Kitchen Appliance",
-      status: "Pending",
-      image: "https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&q=80&w=400",
-    },
-    {
-      id: 5,
-      name: "Modena Gas Stove",
-      supplier: "Modena",
-      category: "Kitchen Appliance",
-      status: "Pending",
-      image: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&q=80&w=400",
-    },
-    {
-      id: 6,
-      name: "iPhone 14 Pro",
-      supplier: "Grab",
-      category: "Smartphone",
-      status: "Verified",
-      image: "https://images.unsplash.com/photo-1678685888221-cda773a3dcdb?auto=format&fit=crop&q=80&w=400",
-    }
-  ];
 
   const verifiedProducts = products.filter(product => product.status === "Verified");
   const unverifiedProducts = products.filter(product => product.status === "Pending");
@@ -94,65 +72,6 @@ export default function Products() {
     product.supplier.toLowerCase().includes(searchQuery.toLowerCase()) ||
     product.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const ProductCard = ({ product }) => {
-    const { totalStock, verifiedStock } = calculateStockInfo(product.name);
-    const verifyRate = totalStock > 0 ? Math.round((verifiedStock / totalStock) * 100) : 0;
-    const isFullyVerified = verifyRate === 100;
-    
-    return (
-      <Card key={product.id} className="overflow-hidden">
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-full h-48 object-cover"
-        />
-        <CardContent className="p-6">
-          <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">
-              Supplier: {product.supplier}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Category: {product.category}
-            </p>
-            <div className="flex items-center justify-between mt-2 mb-3">
-              <div className="flex items-center space-x-2">
-                <Archive className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-600">
-                  Stock: {verifiedStock}/{totalStock}
-                </span>
-              </div>
-              <Badge 
-                variant={isFullyVerified ? "default" : "secondary"}
-                className={isFullyVerified ? "text-black" : ""}
-              >
-                {isFullyVerified ? "Verified" : `${verifyRate}% Verified`}
-              </Badge>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <Button 
-                className="w-full text-black"
-                variant="outline"
-                onClick={() => router.push(`/verify?product=${encodeURIComponent(product.name)}`)}
-              >
-                <Package className="mr-2 h-4 w-4" />
-                Verify
-              </Button>
-              <Button 
-                className="w-full text-black"
-                variant="outline"
-                onClick={() => router.push(`/products/${encodeURIComponent(product.name)}/history`)}
-              >
-                <History className="mr-2 h-4 w-4" />
-                History
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  };
 
   return (
     <div className="min-h-screen bg-white pb-16">

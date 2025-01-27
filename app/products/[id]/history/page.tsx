@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Warehouse, Archive } from "lucide-react";
@@ -9,7 +8,31 @@ import { Badge } from "@/components/ui/badge";
 import VerificationList from "@/components/verification-list";
 
 // Mock verification data - Replace with actual data from your backend
-const mockVerifications = {
+interface Verifier {
+  name: string;
+  role: string;
+}
+
+interface Verification {
+  id: string;
+  productId: string;
+  productName: string;
+  verifier: Verifier;
+  date: string;
+  condition: string;
+  stock: number;
+  verified: boolean;
+  notes: string;
+  photos: string[];
+  location: string;
+  department: string;
+}
+
+type MockVerifications = {
+  [key: string]: Verification[];
+};
+
+const mockVerifications: MockVerifications = {
   "Daikin Split AC 1.5PK": [
     {
       id: "v1",
@@ -67,7 +90,7 @@ const mockVerifications = {
   ]
 };
 
-const calculateTotalStock = (verifications) => {
+const calculateTotalStock = (verifications: Verification[]) => {
   const totalStock = verifications.reduce((sum, v) => sum + v.stock, 0);
   const verifiedStock = verifications
     .filter(v => v.verified)
@@ -147,6 +170,7 @@ export default function ProductHistoryPage() {
 
           <div className="space-y-6">
             <VerificationList 
+              verifications={verifications}
               onViewHistory={(productId) => {
                 console.log("View history for:", productId);
               }} 

@@ -175,13 +175,14 @@ function VerificationCard({ verification, onViewHistory }: VerificationCardProps
 }
 
 interface VerificationListProps {
+  verifications: Verification[];
   onViewHistory: (productId: string) => void;
 }
 
-export default function VerificationList({ onViewHistory }: VerificationListProps) {
+export default function VerificationList({ verifications, onViewHistory }: VerificationListProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {mockVerifications.map((verification) => (
+      {verifications.map((verification) => (
         <VerificationCard
           key={verification.id}
           verification={verification}
